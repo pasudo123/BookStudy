@@ -17,7 +17,7 @@ public class Calculator {
 //			while((line = br.readLine()) != null){
 //				sum += Integer.parseInt(line);
 //			}
-//
+//	
 //			return sum;
 //		}
 //		catch(IOException e){
@@ -71,44 +71,94 @@ public class Calculator {
 		}// finally()
 	}
 	
-	// 덧셈 테스트 메소드
-	public Integer calcSum(String filePath) throws IOException{
+	public Integer lineReadTemplate(String filePath, LineCallback callback, int initVal) throws IOException{
+		BufferedReader br = null;
+		Integer res = null; 
 		
-		// 익명 내부 클래스를 해당 파라미터로 전달
-		BufferedReaderCallback sumCallback = 
-			new BufferedReaderCallback(){
-				@Override
-				public Integer doSomethingWithReader(BufferedReader br) throws IOException{
-					Integer sum = 0;
-					String line = null;
-					
-					while((line = br.readLine()) != null){
-						sum += Integer.valueOf(line);
-					}
-					
-					return sum;
-				}
-		};
+		try{
+			
+			br = new BufferedReader(new FileReader(filePath));
+			res = initVal;
+			String line = null;
+			
+			// 파일의 각 라인을 루프를 돌면서 가져오는 것도 템플릿 담당
+			// 각 라인의 내용을 가지고 계산하는 작업만 콜백에게 맡긴다.
+			// 콜백이 계산한 값을 저장해두었다가 다음 라인 계산에 다시 사용한다.
+			while((line = br.readLine()) != null){
+				res = callback.doSomethingWithLine(line, res);
+			}
+			
+			return res;
+		}
+		catch(IOException e){
+			System.out.println(e.getMessage());
+		}
+		finally{
+			if(br != null)
+				br.close();
+		}
 		
-		return fileReadTemplate(filePath, sumCallback);
+		return res;
 	}
 	
-	public Integer calcMultiply(String filePath) throws IOException{
-		BufferedReaderCallback multiplyCallback = 
-			new BufferedReaderCallback(){
-				@Override
-				public Integer doSomethingWithReader(BufferedReader br) throws IOException {
-					Integer multiply = 1;
-					String line = null;
-					
-					while((line = br.readLine()) != null){
-						multiply *= Integer.valueOf(line);
-					}
-					
-					return multiply;
-				}
-			};
-			
-		return fileReadTemplate(filePath, multiplyCallback);
+//	// 덧셈 테스트 메소드
+//	public Integer calcSum(String filePath) throws IOException{
+//		// 익명 내부 클래스를 해당 파라미터로 전달
+//		BufferedReaderCallback sumCallback = 
+//			new BufferedReaderCallback(){
+//				@Override
+//				public Integer doSomethingWithReader(BufferedReader br) throws IOException{
+//					Integer sum = 0;
+//					String line = null;
+//					
+//					while((line = br.readLine()) != null){
+//						sum += Integer.valueOf(line);
+//					}
+//					
+//					return sum;
+//				}
+//		};
+//		
+//		return fileReadTemplate(filePath, sumCallback);
+//	}
+	
+	public Integer calcSum(String filePath) throws IOException{
+		LineCallback sumCallback = new LineCallback(){
+			@Override
+			public Integer doSomethingWithLine(String line, Integer value) {
+				return value + Integer.valueOf(line);
+			}
+		};
+		return lineReadTemplate(filePath, sumCallback, 0);
+	}
+	
+//	// 곱셈 콜백 메소드
+//	public Integer calcMul(String filePath) throws IOException{
+//		BufferedReaderCallback multiplyCallback = 
+//			new BufferedReaderCallback(){
+//				@Override
+//				public Integer doSomethingWithReader(BufferedReader br) throws IOException {
+//					Integer multiply = 1;
+//					String line = null;
+//					
+//					while((line = br.readLine()) != null){
+//						multiply *= Integer.valueOf(line);
+//					}
+//					
+//					return multiply;
+//				}
+//			};
+//			
+//		return fileReadTemplate(filePath, multiplyCallback);
+//	}
+	
+	public Integer calcMul(String filePath) throws IOException{
+		LineCallback mulCallback = new LineCallback(){
+			public Integer doSomethingWithLine(String line, Integer value){
+				return value * Integer.valueOf(line);
+			}
+		};
+		
+		return lineReadTemplate(filePath, mulCallback, 1);
 	}
 }

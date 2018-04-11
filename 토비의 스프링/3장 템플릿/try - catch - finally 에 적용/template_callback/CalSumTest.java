@@ -24,6 +24,6 @@ public class CalSumTest {
 	
 	@Test
 	public void mulOfNumbers() throws IOException{
-		assertEquals((int)calculator.calcMultiply(this.numFilePath), (24));
+		assertEquals((int)calculator.calcMul(this.numFilePath), (24));
 	}
 }
