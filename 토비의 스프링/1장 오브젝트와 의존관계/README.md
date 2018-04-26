@@ -1,6 +1,6 @@
 # 오브젝트와 의존관계
  
-## Step1
+## Step 1
 #### 사용자 정보를 DB에 넣고 관리할 수 있는 DAO 클래스.
 ~~~
 package tobi_spring.chapter1;
@@ -66,7 +66,7 @@ public class UserDao {
 
 ~~~
 
-## Step2
+## Step 2
 #### 중복된 코드에 대한 메소드 추출
 ~~~
 private Connection getConnection() throws ClassNotFoundException, SQLException{
@@ -85,7 +85,7 @@ private Connection getConnection() throws ClassNotFoundException, SQLException{
 }
 ~~~
 
-## Step3
+## Step 3
 #### 템플릿 메소드 패턴
 슈퍼클래스에서 기본적인 로직의 흐름을 작성하고, 이후에 추상메소드 혹은 오버라이딩 가능한 메소드들은 서브클래스에서 담당하는 기법을 __템플릿 메소드 패턴__ 이라고 부른다.  
 
@@ -138,7 +138,7 @@ public class DUserDao extends UserDao{
 }
 ~~~
 
-## Step4
+## Step 4
 #### DAO 확장 및 클래스 분리
 클래스를 분리시키고 아예 하나의 인스턴스로써 DB Connection 객체를 관리하기 위함
 ~~~
@@ -203,7 +203,7 @@ public class SimpleConnectionMaker {
 }
 ~~~
 
-## Step5
+## Step 5
 #### 인터페이스의 도입
 인터페이스를 도입함으로써, 클래스가 특정 클래스에 종속되는 관계를 종속적이지 않도록 즉, 결합도를 느슨하게 낮출 수 있다. 이러한 과정을 통해서 해당 인터페이스 구현체를 이용함으로써 특정 클래스의 메소드에 대한 기능을 명확히 알 필요가 없다.
 ~~~
@@ -265,7 +265,7 @@ public class UserDao {
 }
 ~~~
 
-## Step6
+## Step 6
 #### 관계설정 책임의 분리
 Step5 에서의 UserDao 클래스를 살펴보면 UserDao 클래스는 여전히 구체적인 클래스를 알고있어야만 인터페이스 구현체를 만들 수 있다. 이 때문에 인터페이스를 이용한 분리에도 불구하고 UserDao 변경 없이는 DB커넥션 기능의 확장이 자유롭지 못하다. UserDao 내부에 있는 커넥션 기능이 따로 분리되어야 한다. 기능의 확장이 자유롭지 못하다. UserDao와 UserDao 가 사용할 ConnectionMaker의 특정 구현 클래스 사이의 관계를 설정해주는 것에 관한 관심사이며 이 관심사를 담은 코드를 UserDao에서 분리하지 않으면 UserDao는 결코 독립적으로 확장 가능한 클래스가 될 수 없다.  
 
@@ -408,7 +408,7 @@ public class DaoFactory {
 }
 ~~~
 
-## Step8 : 스프링IoC
+## Step 8 : 스프링IoC
 #### DaoFactory 수정
 DaoFactory를 스프링의 빈 팩토리, 즉 애플리케이션 컨텍스트가 사용할 수 있도록 애노테이션을 달아준다.
 * 스프링이 빈 팩토리를 위한 오브젝트 설정을 담당하는 클래스라고 인식할 수 있도록 @Configuration 애노테이션 추가
