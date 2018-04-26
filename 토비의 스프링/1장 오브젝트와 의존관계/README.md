@@ -308,3 +308,102 @@ public class UserDaoTest {
 	}
 }
 ~~~
+
+## Step 7 : 제어의 역전(IoC)
+#### 제어의 역전
+앞선 UserDaoTest 클래스에는 기존에 UserDao 가 직접 담당하던 기능, 즉 어떤 ConnectionMaker 구현 클래스를 사용할지를 결정하는 기능을 맡게되었다. 이부분에서 UserDao가 ConnectionMaker 인터페이스를 구현한 특정 클래스로부터 완벽하게 독립할 수 있도록 UserDao 클라이언트인 UserDaoTest가 그 수고를 담당하게 되었다. 하지만 __UserDaoTest__ 는 진짜 __TEST 를 위한 클래스__ 이기 때문에 다시 관심사를 분리해줄 필요가 있다.  
+    
+분리될 기능은 UserDao 와 ConnectionMaker 구현 클래스의 오브젝트를 만드는 것과, 그렇게 만들어진 두 개의 오브젝트가 연결되어 사용될 수 있도록 관계를 맺어주는 것이다.  
+#### 오브젝트 팩토리 : 팩토리
+~~~
+public class DaoFactory {
+	public UserDao userDao(){
+		
+		/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+		 * 
+		 * [팩토리 메소드] 는 UserDao 타입의 오브젝트를 
+		 * (1) 어떻게 만들고
+		 * (2) 어떻게 준비시킬지
+		 * 결정한다.
+		 * 
+		 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+		
+		ConnectionMaker connectionMaker = new DConnectionMaker();
+		UserDao userDao = new UserDao(connectionMaker);
+		
+		return userDao;
+	}
+}
+~~~
+
+#### 팩토리 메소드를 사용하는 UserDaoTest
+~~~
+public class UserDaoTest {
+	public static void main(String[]args) throws ClassNotFoundException, SQLException{
+		
+		/**
+		 * 팩토리를 사용하도록 만듦
+		 * **/
+		
+		UserDao dao = new DaoFactory().userDao();
+	}
+}
+~~~
+
+__DaoFactory__ 를 사용함으로써 얻는 이점은 아래와 같다.   
+* __애플리케이션 컴포넌트 역할을 하는 오브젝트__ & __애플리케이션 구조를 결정하는 오브젝트__ 를 분리
+
+#### 오브젝트 팩토리의 활용
+Dao 클래스에 따른 코드의 반복
+~~~
+public class DaoFactory {
+	
+	/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * 
+	 * Dao 클래스에 따른 코드의 반복
+	 * 
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+	
+	public UserDao userDao(){
+		ConnectionMaker connectionMaker = new DConnectionMaker();
+		UserDao userDao = new UserDao(connectionMaker);
+		
+		return userDao;
+	}
+	
+	public AccountDao accountDao(){
+		ConnectionMaker connectionMaker = new DConnectionMaker();
+		AccountDao accountDao = new AccountDao(connectionMaker);
+		
+		return accountDao;
+	}
+	
+	public MessageDao messageDao(){
+		ConnectionMaker connectionMaker = new DConnectionMaker();
+		MessageDao messageDao = new MessageDao(connectionMaker);
+		
+		return messageDao;
+	}
+}
+~~~
+   
+__해결책__ 은 Connection Maker 를 생성하는 메소드를 분리시킨다.
+~~~
+public class DaoFactory {
+	public UserDao userDao(){
+		UserDao userDao = new UserDao(connectionMaker());
+		
+		return userDao;
+	}
+	
+	// 이하 생략
+	
+	/**
+	 * 메소드만 분리
+	 * **/
+	
+	private ConnectionMaker connectionMaker(){
+		return new DConnectionMaker();
+	}
+}
+~~~
