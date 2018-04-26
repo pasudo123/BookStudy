@@ -202,3 +202,65 @@ public class SimpleConnectionMaker {
 	}
 }
 ~~~
+
+## Step5
+#### 인터페이스의 도입
+인터페이스를 도입함으로써, 클래스가 특정 클래스에 종속되는 관계를 종속적이지 않도록 즉, 결합도를 느슨하게 낮출 수 있다. 이러한 과정을 통해서 해당 인터페이스 구현체를 이용함으로써 특정 클래스의 메소드에 대한 기능을 명확히 알 필요가 없다.
+~~~
+import java.sql.Connection;
+import java.sql.SQLException;
+
+/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+ * 
+ * [ 인터페이스의 도입  ]
+ * 클래스가 하나의 클래스에 종속되는 문제를 해결하기 위해서 등장
+ * 클래스끼리의 결합도를 낮추기 위함이며 더불어서 해당 클래스가 
+ * 특정 인터페이스의 구현체를 이용함으로써 사용 클래스에 메소드 
+ * 기능을 알지 않아도 된다는 것
+ * 
+ * 단지 인터페이스를 통해서 필요한 기능을 사용하면 되는 것이다.
+ * 
+ * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+public interface ConnectionMaker {
+	public Connection makeConnection() throws ClassNotFoundException, SQLException;
+}
+~~~
+
+#### 인터페이스를 상속받는 각각의 클래스
+인터페이스를 상속받는 클래스들은 자신이 맡은 역할에 대한 기능을 명세하고 있다.
+~~~
+public class DConnectionMaker implements ConnectionMaker{
+
+	@Override
+	public Connection makeConnection() throws ClassNotFoundException, SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+public class NConnectionMaker implements ConnectionMaker{
+
+	@Override
+	public Connection makeConnection() throws ClassNotFoundException, SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
+~~~
+
+#### 해당 인터페이스를 호출하는 클래스
+~~~
+public class UserDao {
+	
+	ConnectionMaker connectionMaker;
+	
+	public UserDao(){
+		connectionMaker = new DConnectionMaker();
+	}
+	
+	// 이하 내용 생략
+	
+}
+~~~
