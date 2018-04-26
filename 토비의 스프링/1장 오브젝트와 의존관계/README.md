@@ -264,3 +264,47 @@ public class UserDao {
 	
 }
 ~~~
+
+## Step6
+#### 관계설정 책임의 분리
+Step5 에서의 UserDao 클래스를 살펴보면 UserDao 클래스는 여전히 구체적인 클래스를 알고있어야만 인터페이스 구현체를 만들 수 있다. 이 때문에 인터페이스를 이용한 분리에도 불구하고 UserDao 변경 없이는 DB커넥션 기능의 확장이 자유롭지 못하다. UserDao 내부에 있는 커넥션 기능이 따로 분리되어야 한다. 기능의 확장이 자유롭지 못하다. UserDao와 UserDao 가 사용할 ConnectionMaker의 특정 구현 클래스 사이의 관계를 설정해주는 것에 관한 관심사이며 이 관심사를 담은 코드를 UserDao에서 분리하지 않으면 UserDao는 결코 독립적으로 확장 가능한 클래스가 될 수 없다.  
+
+따라서 UserDao 와 ConnectionMaker 인터페이스를 연결해주기 위한 하나의 클래스를 만들어준다. UserDaoTest 클래스이다. UserDao의 클라이언트에서 UserDao를 사용하기 이전에, 먼저 UserDao가 어떤 ConnectionMaker의 구현 클래스를 사용할 지 결정하도록 하는 클래스인 것이다. __오브젝트와 오브젝트 사이의 관계를 설정해주는 것__ 클래스와 클래스 간의 관계가 아니다.  
+
+#### UserDao 클라이언트
+~~~
+public class UserDao {
+	
+	ConnectionMaker connectionMaker;
+	
+	public UserDao(ConnectionMaker connectionMaker){
+		this.connectionMaker = connectionMaker;
+	}
+	
+	// 이하 내용 생략
+	
+}
+~~~
+  
+#### UserDaoTest 클래스
+~~~
+import java.sql.SQLException;
+
+public class UserDaoTest {
+	public static void main(String[]args) throws ClassNotFoundException, SQLException{
+		
+		/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+		 * 
+		 * UserDao 가 사용할 ConnectionMaker 구현 클래스를 결정하고 오브젝트를 만든다.
+		 * 
+		 * UserDaoTest 는 런타임 의존관계를 설정하는 책임을 담당한다. 따라서 특정 
+		 * ConnectionMaker 구현 클래스의 오브젝트를 만들고, UserDao 생성자 파라미터에 
+		 * 넣어 두 개의 오브젝트를 연결해준다. 그리고 자기 책임이던 UserDao에 대한 테스트 작업을 실시한다.
+		 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+		
+		ConnectionMaker connectionMaker = new DConnectionMaker();
+		
+		UserDao userDao = new UserDao(connectionMaker);
+	}
+}
+~~~
