@@ -1,6 +1,6 @@
 ## 오브젝트와 의존관계
   
-사용자 정보를 DB에 넣고 관리할 수 있는 DAO 클래스.
+### 사용자 정보를 DB에 넣고 관리할 수 있는 DAO 클래스.
 ~~~
 package tobi_spring.chapter1;
 
@@ -80,5 +80,57 @@ private Connection getConnection() throws ClassNotFoundException, SQLException{
 	Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/daum","root","rootpass");
 
 	return c;
+}
+~~~
+
+### 템플릿 메소드 패턴
+슈퍼클래스에서 기본적인 로직의 흐름을 작성하고, 이후에 추상메소드 혹은 오버라이딩 가능한 메소드들은 서브클래스에서 담당하는 기법을 __템플릿 메소드 패턴__ 이라고 부른다.  
+
+__추상 클래스 UserDao__
+~~~
+public abstract class UserDao {
+	
+	/**
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 * **/
+	
+	/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * 구현코드는 제거되고 추상메소드로 변경되었음
+	 * 메소드에 대한 구현은 서브클래스에서 담당할 수 있도록 설정
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+	public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
+}
+~~~
+__UserDao 를 상속받는 두 개의 클래스__
+~~~
+public class NUserDao extends UserDao{
+
+	@Override
+	public Connection getConnection() throws ClassNotFoundException, SQLException {
+		/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+		 * 
+		 * 	  [N] 사 DB Connection 생성 코드
+		 * 
+		 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+		return null;
+	}
+
+}
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+public class DUserDao extends UserDao{
+
+	@Override
+	public Connection getConnection() throws ClassNotFoundException, SQLException {
+		/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+		 * 
+		 * 	  [D] 사 DB Connection 생성 코드
+		 * 
+		 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+		return null;
+	}
+
 }
 ~~~
