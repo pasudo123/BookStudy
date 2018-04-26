@@ -407,3 +407,59 @@ public class DaoFactory {
 	}
 }
 ~~~
+
+## Step8 : 스프링IoC
+#### DaoFactory 수정
+DaoFactory를 스프링의 빈 팩토리, 즉 애플리케이션 컨텍스트가 사용할 수 있도록 애노테이션을 달아준다.
+* 스프링이 빈 팩토리를 위한 오브젝트 설정을 담당하는 클래스라고 인식할 수 있도록 @Configuration 애노테이션 추가
+* 오브젝트를 만들어주는 메소드에는 @Bean 애노테이션 추가
+~~~
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration	// 애플리케이션 컨텍스트 또는 빈 팩토리가 사용할 설정 정보
+public class DaoFactory {
+	
+	@Bean // 오브젝트 생성을 담당하는 IoC용 메소드
+	public UserDao userDao(){
+		UserDao userDao = new UserDao(connectionMaker());
+		
+		return userDao;
+	}
+
+	@Bean
+	private ConnectionMaker connectionMaker(){
+		return new DConnectionMaker();
+	}
+}
+~~~
+   
+#### UserDaoTest 수정
+getBean() 메소드의 파라미터 __첫번째 인자__ 와 __두번째 인자__ 설명. 
+* "userDao" 는 ApplicationContext에 등록된 빈의 이름이다. DaoFactory에서 __@Bean이라는 애노테이션을 userDao 라는 이름의 메소드에 붙였기 때문에__ userDao라는 이름의 빈을 가져오는 것은 DaoFactory에 userDao() 메소드를 호출해서 그 결과를 가져오는 것이다.
+* getBean() 메소드는 기본적으로 Object 타입을 리턴하게 되어 있다. 따라서 매번 리턴되는 오브젝트를 캐스팅해줘야 하는 부담이 존재.따라서 두번째 파라미터에 해당 __리턴타입__ 을 넣어줌으로써, 지저분한 코딩을 하지 않아도 된다.
+
+~~~
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class UserDaoTest {
+	public static void main(String[]args) throws ClassNotFoundException, SQLException{
+		
+		/**
+		 * Dao 설정정보를 사용하는 애플리케이션 컨텍스트 생성하며,
+		 * @Configuration 애노테이션이 붙은 자바 코드의 설정 정보를 사용하기 위해 "AnnotationConfigApplicationContext"를 이용
+		 * **/
+		ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+		UserDao dao = context.getBean("userDao", UserDao.class);
+	}
+}
+~~~
+
+#### IoC vs Spring IoC 비교
+* 오브젝트 팩토리에 대응되는 것이 스프링의 애플리케이션 컨텍스트
+* 스프링에서는 이 애플리케이션 컨텍스트를 IoC 컨텍스트 / 스프링 컨테이너 / 빈 팩토리 라고 지칭한다.
+#### 애플리케이션 컨텍스트를 사용했을 때 얻을 수 있는 장점
+* __클라이언트는 구체적인 팩토리 클래스를 알 필요가 없다.__ 그리고 필요할 때마다 팩토리 오브젝트를 생성해야 하는 번거로움에서 벗어날 수 있다. 일관된 방식으로 원하는 오브젝트를 가져올 수 있는 장점이 존재하며 XML 처럼 단순한 방법을 사용해 애플리케이션 컨텍스트가 사용할 IoC 설정정보를 만들 수 있다.
+* __애플리케이션 컨텍스트는 종합 IoC 서비스를 제공__ 오브젝트가 만들어지는 방식과 시점 그리고 전략을 다르게 가져갈 수 있고 이에 부가적으로 자동생성, 오브젝트에 대한 후처리, 정보와 조합, 설정방식의 다변화, 인터셉팅 등 오브젝트를 효과적으로 활용할 수 있는 다양한 기능을 제공
+* __애플리케이션 컨텍스트는 빈을 검색하는 다양한 방법을 제공__ 애플리케이션 컨텍스트의 getBean()메소드는 빈의 이름을 이용해 빈을 찾을 수 있게 도와준다. 타입만으로 빈을 검색하거나 특별한 애노테이션 설정이 되어있는 빈을 찾을 수 있다.
