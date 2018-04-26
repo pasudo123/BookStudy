@@ -64,3 +64,21 @@ public class UserDao {
 }
 
 ~~~
+
+### 중복된 코드에 대한 메소드 추출
+~~~
+private Connection getConnection() throws ClassNotFoundException, SQLException{
+	
+	/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * 
+	 * 중복된 코드를 독립적인 메소드로 만들어서 관심사를 분리
+	 * 따라서 DB 연결이 필요하면 getConnection()메소드를 이용할 수 있도록 설정
+	 * 이를 [ 메소드 추출 ] 이라고 부른다.
+	 * 
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+	Class.forName("com.mysql.jdbc.Driver");
+	Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/daum","root","rootpass");
+
+	return c;
+}
+~~~
