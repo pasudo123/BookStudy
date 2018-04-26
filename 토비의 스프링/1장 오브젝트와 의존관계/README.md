@@ -1,6 +1,7 @@
-## 오브젝트와 의존관계
-  
-### 사용자 정보를 DB에 넣고 관리할 수 있는 DAO 클래스.
+# 오브젝트와 의존관계
+ 
+## Step1
+#### 사용자 정보를 DB에 넣고 관리할 수 있는 DAO 클래스.
 ~~~
 package tobi_spring.chapter1;
 
@@ -65,7 +66,8 @@ public class UserDao {
 
 ~~~
 
-### 중복된 코드에 대한 메소드 추출
+## Step2
+#### 중복된 코드에 대한 메소드 추출
 ~~~
 private Connection getConnection() throws ClassNotFoundException, SQLException{
 	
@@ -83,7 +85,8 @@ private Connection getConnection() throws ClassNotFoundException, SQLException{
 }
 ~~~
 
-### 템플릿 메소드 패턴
+## Step3
+#### 템플릿 메소드 패턴
 슈퍼클래스에서 기본적인 로직의 흐름을 작성하고, 이후에 추상메소드 혹은 오버라이딩 가능한 메소드들은 서브클래스에서 담당하는 기법을 __템플릿 메소드 패턴__ 이라고 부른다.  
 
 __추상 클래스 UserDao__
@@ -132,5 +135,70 @@ public class DUserDao extends UserDao{
 		return null;
 	}
 
+}
+~~~
+
+## Step4
+#### DAO 확장 및 클래스 분리
+클래스를 분리시키고 아예 하나의 인스턴스로써 DB Connection 객체를 관리하기 위함
+~~~
+package tobi_spring.chapter1.step4;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class UserDao {
+	
+	/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * 
+	 * 	상속관계가 아닌 아예 독립적인 클래스로 분리시키기 위함
+	 * 
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+	private SimpleConnectionMaker simpleConnectionMaker;
+	
+	public UserDao(){
+		/**ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+		 * 
+		 * 상태를 관리하는 것이 아니기 때문에, 한 번만 인스턴스를 만들어놓고, 
+		 * 인스턴스를 변수에 저장하여 메소드해서 사용할 수 있도록 하기 위함
+		 * 
+		 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ**/
+		simpleConnectionMaker = new SimpleConnectionMaker();
+	}
+	
+	public void add(User user) throws SQLException, ClassNotFoundException{
+		Connection c = simpleConnectionMaker.makeNewConnection();
+		
+		// 이하 내용 생략
+	}
+	
+	public User get(String id) throws ClassNotFoundException, SQLException{
+		Connection c = simpleConnectionMaker.makeNewConnection();
+		
+		// 이하 내용 생략
+	}
+}
+~~~
+#### DB Connection 기능을 독립시킨 SimpleConnectionMaker 클래스
+아예 클래스를 분리시켜버렸다.
+~~~
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class SimpleConnectionMaker {
+	
+	// 아예 DB Connection 을 만드는 클래스를 분리하였기 때문에
+	// 추상 클래스로 만들 필요가 없다.
+	
+	public Connection makeNewConnection() throws ClassNotFoundException, SQLException{
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/daum","root","rootpass");
+	
+		return c;
+	}
 }
 ~~~
