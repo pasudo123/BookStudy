@@ -24,10 +24,12 @@
 | 요청 메세지 | 구분 | 응답 메세지 |  
 |------------|------|------------|
 |GET /test/hi-there.txt HTTP/1.0|시작줄|HTTP/1.0 200 OK|
-|Accept: text/*|헤더|Content-Type:text/plain<br>Content-length:19<br>[ 공백 ]|
-||본문|Hi! I'm a message!|0
+|Accept: text/* |헤더|Content-Type:text/plain<br>Content-length:19<br>[ 공백 ]|
+||본문|Hi! I'm a message!|
+
 * 시작줄
     * 메시지의 첫 줄은 시작줄로, 요청이라면 무엇을 해야하는지 응답이라면 무슨 일이 일어났는지 나타낸다.
+    
 * 헤더
     * 시작줄 다음에는 0개 이상의 헤더 필드가 이어진다. 각 헤더 필드는 쉬운 구문분석을 위해 쌍점(:) 으로 구분된다. 각각 이름과 값으로 구성되고 헤더 필드를 추가하려면 한 줄을 더해서 추가해주고 헤더 필드는 빈줄로 끝난다.
 * 본문
@@ -36,6 +38,9 @@
     * 응답 본문은 클라이언트로 데이터를 반환한다.
 * TCP / IP
     * 해당 내용에 대한 자세한 설명은 아래의 링크를 참조
+    * http://pasudo123.tistory.com/195?category=751090
+    * http://pasudo123.tistory.com/196?category=751090
+    * http://pasudo123.tistory.com/201?category=751090
 * 웹의 구성요소 
     * 프락시 : 클라이언트와 서버 사이에 위치한 HTTP 중개자 
     * 캐시 : 많이 찾는 웹페이지를 클라이언트 가까이에 보관하는 HTTP 창고
